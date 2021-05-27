@@ -13,8 +13,10 @@ Pentru a rula proiectul, este nevoie de:
 - Compilator C
 - Compilator NASM
 ```
-sudo apt-get install build-essential qemu nasm 
+sudo apt-get install build-essential qemu nasm ovmf
 ```
+Pentru a se pregati meidul de dezvoltare EDK2, se vor urma instructiunile de pe site-ul lor.<br>
+
 
 ### Compilare
 Initial se cloneaza proiectul.
@@ -49,6 +51,10 @@ Bootloader-ul se va lansa. Extensia proiectului initial se poate observa prin op
 - [The UEFI Maze Game](https://uefi.blogspot.com/2016/11/the-uefi-maze-game-part-1.html)
 - [Firmware Maze](https://github.com/liute62/Firmware-UEFI-Maze-Game)
 
+### Element de inovatie
+Proiectul curent aduce, in plus, partea de integrare intr-un bootloader sursa, capabil sa incarce un SO. <br>
+Astfel, se poate utiliza in viitor chiar si in afara unei masini virtuale (ex.: QEMU), ca bootloader principal al unui sistem de calcul.
+
 ## Detalii de implementare
 
 Proiectul este scris in C, si utilizeaza librarii specifice UEFI, din platforma [EDK2](https://github.com/tianocore/edk2).
@@ -63,7 +69,34 @@ Urmatoarele fisiere sunt contributia mea personala, integral:
 - src/util/MemUtils.c
 
 Partial:
-- src/util/DrawUtils.c
 - src/menus/Menus.h
 - src/menus/Menus.c
 - src/menus/MainMenu.c
+
+### Descreire implementare functii
+Initial, am cautat sa inteleg proiectul sursa, pentru a integra cat mai bine jocul in acesta. Necesitatea functiilor a fost dedusa treptat, observand portiunile de cod ce se repeta / sunt foarte complexe in scriere. <br>
+Majoritatea functiilor utilizate se afla in src/menus/GameUtils.c, iar implementarile principale sunt:
+
+#### Desenarea labirintului - DrawMaze()
+Urmeaza modelul desnearii logo-ului bootloaderului sursa. <br>
+Astfel, se defineste un array de tip CHAR8 pentru fiecare maze de desenat. Se foloseste CHAR8 deoarece culorile UEFI sunt definite astfel (prin etichete, de ex.: EFI_RED, EFI_GREEN). <br>
+Se definesc dimensiunile array-ului (2 dimensiuni - se va accesa ca o matrice), si coordonatele coltului din stanga sus, de unde se va incepe desenarea. Se foloseste wrapperul proiectului sursa: DrawImage(...), ce foloseste UEFI Graphics Output Protocol.
+
+#### Schimbarea culorii - DrawMazeColor(CHAR8 maze_color)
+Se definesc array-uri de tip CHAR8 diferite pentru fiecare culoare + un array pe care se va plimba caracterul. Nu este o metoda eficienta, insa este singura gasita momentan, datorita macro-urilor necesare (#define). Functia primeste culoarea dorita si deseneaza pe ecran maze-ul dorit ca si culoare, copiind de fiecare data maze-ul in care se va deplasa caracterul.
+
+#### Deplasarea caracterului - int moveInMaze(int pos, int height, int moves[4])
+Functia foloseste UEFI Standard Input Text Protocol, si defineste mutarile posibile intr-o anumita pozitie, facand legatura cu desenarea in maze a acestora.<br>
+Functia primeste pozitia pentru care se definesc mutarile (pos), inaltimea maze-ului (height), si un array in care se specifica pozitiile (moves[4]). Ordinea tastelor este W, A, S, D (sus, stanga, jos, dreapta), iar pozitiile posibile sunt marcate cu 1, cele imposibile cu 0. Un exemplu de array: [1, 0, 0, 0], inseamna ca singura mutare valida este in sus (tasta W).
+
+### Probleme intampinate
+
+#### Performantele video
+Jocul efectueaza o multime de operatii cu Graphics Output Protocol, solictiand memoria video. La fiecare mutare valida in maze, imaginea acestuia se va reincarca, la fel si in cazul schimbarii culorii, de exemplu. <br>
+Incercarea de a implementa labirinturi mai complexe va solicita memoria video, suficient incat sa produca un deranj vizual: timpul de incarcare a liniilor va creste iar "refresh-ul" labirintului se face foarte lent.<br><br>
+Rezolvarea problemei ar implica regandirea intregii implementari a mutarilor in maze, insa este luata in considerare pe viitor pentru progresul proiectului. 
+
+#### Warning-uri inutile
+La compilare, apar warning-uri de tipul -W-unused-function, deoarece functiile utile nu sunt utilizate in acelasi fisier, ci in alte fisiere.<br><br>
+Pentru o compilare "curata", s-au adaugat pragma-uri in aceste cazuri.
+
