@@ -3,9 +3,13 @@
 #include <Library/BaseLib.h>
 #include "Menus.h"
 
+// Aici se face intrarea in functiile tuturor meniurilor posibile
+
 MENU EnterMainMenu(BOOLEAN first);
 MENU EnterSetupMenu();
 MENU EnterBootMenu();
+MENU EnterGameMenu();
+MENU EnterLevelMenu();
 
 void StartMenus() {
     MENU current_menu = MENU_MAIN_MENU;
@@ -30,6 +34,22 @@ void StartMenus() {
                 gRT->ResetSystem(EfiResetShutdown, 0, 0, "shutdown");
                 CpuDeadLoop();
                 break;
+
+	    case MENU_GAME_EASY:
+		current_menu = EnterGameMenuEasy();
+		break;
+
+	    case MENU_GAME_MEDIUM:
+                current_menu = EnterGameMenuMedium();
+                break;
+
+	    case MENU_GAME_HARD:
+                current_menu = EnterGameMenuHard();
+                break;
+
+	    case MENU_LEVEL:
+		current_menu = EnterLevelMenu();
+		break;
         }
 
         first = FALSE;
