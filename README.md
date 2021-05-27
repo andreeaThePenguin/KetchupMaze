@@ -15,8 +15,8 @@ Pentru a rula proiectul, este nevoie de:
 ```
 sudo apt-get install build-essential qemu nasm ovmf
 ```
-Pentru a se pregati meidul de dezvoltare EDK2, se vor urma instructiunile de pe site-ul lor.<br>
-
+Pentru a se pregati mediul de dezvoltare EDK2, se vor urma instructiunile de pe site-ul lor.<br>
+Recomand urmatoarea [metoda / tutorial](https://wiki.ubuntu.com/UEFI/EDK2).
 
 ### Compilare
 Initial se cloneaza proiectul.
