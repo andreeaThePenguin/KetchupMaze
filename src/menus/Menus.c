@@ -35,6 +35,10 @@ void StartMenus() {
                 CpuDeadLoop();
                 break;
 
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
+
+
 	    case MENU_GAME_EASY:
 		current_menu = EnterGameMenuEasy();
 		break;
@@ -46,6 +50,8 @@ void StartMenus() {
 	    case MENU_GAME_HARD:
                 current_menu = EnterGameMenuHard();
                 break;
+
+	#pragma GCC diagnostic pop
 
 	    case MENU_LEVEL:
 		current_menu = EnterLevelMenu();

@@ -79,6 +79,10 @@ static CHAR8 Character[] = {
 };
 #undef X
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+
+
 static void DrawDot()
 {
         // Curatare ecran + culori tematice
@@ -173,8 +177,6 @@ static EFI_INPUT_KEY getKey()
 // Returneaza noua pozitie, in cazul in care o uitam
 
 // Aveam warning de "unused function", dar functia e folosita in GameMenu.c
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
 
 static int moveInMaze(int pos, int height, int moves[4])       {
         if(MazeImage[pos] == 1)   { // verificare fiecare pozitie posibila in maze
