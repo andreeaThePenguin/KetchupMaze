@@ -1,6 +1,7 @@
 # Ketchup Maze
 
 Ketchup Maze este o extensie a bootloader-ului UEFI [TomatBoot](https://github.com/TomatOrg/TomatBoot), ce implementeaza un joc de tip labirint.
+Proiectul este scris in C, cu ajutorul mediului de dezvoltare [EDK2](https://github.com/tianocore/edk2).
 
 # Preview
 
@@ -66,8 +67,6 @@ Proiectul curent aduce, in plus, partea de integrare intr-un bootloader sursa, c
 Astfel, se poate utiliza in viitor chiar si in afara unei masini virtuale (ex.: QEMU), ca bootloader principal al unui sistem de calcul.
 
 ## Detalii de implementare
-
-Proiectul este scris in C, si utilizeaza librarii specifice UEFI, din platforma [EDK2](https://github.com/tianocore/edk2).
 
 ### Contributii personale
 Urmatoarele fisiere sunt contributia mea personala, integral:
