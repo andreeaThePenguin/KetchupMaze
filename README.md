@@ -1,75 +1,79 @@
 # Ketchup Maze
 
-Ketchup Maze este o extensie a bootloader-ului UEFI [TomatBoot](https://github.com/TomatOrg/TomatBoot), ce implementeaza un joc de tip labirint.
-Proiectul este scris in C, cu ajutorul mediului de dezvoltare [EDK2](https://github.com/tianocore/edk2).
+Ketchup Maze is an extension of the [TomatBoot](https://github.com/TomatOrg/TomatBoot) bootloader, implementing a labyrinth game as an extra menu option.
+The project is written in C, with the help of [EDK2](https://github.com/tianocore/edk2).
+
+Its **innovative element** is the addition of an UEFI game in an already-existing functional bootloader.
+
+The project has been done as part of the "Systems with Microprocessors" course at University Politehnica of Bucharest. 
 
 # Preview
 
-Meniu principal         |  Alegere nivel
+Main menu         |  Level selection
 :-------------------------:|:-------------------------:
 ![](/screenshots/main_menu.jpeg)  |  ![](/screenshots/level_menu.jpeg)
 
-Culori         |  Gameplay
+Color selection         |  Gameplay
 :-------------------------:|:-------------------------:
 ![](/screenshots/green.jpeg)  |  ![](/screenshots/win.jpeg)
 
-## Instructiuni de utilizare
+## Usage
 
-Proiectul a fost dezvoltat, compilat si testat pe Linux.
+The project was developed, compiled and tested on Linux.
 
-### Dependente
-Pentru a rula proiectul, este nevoie de:
+### Dependencies
+The following dependencies are required for running the project:
 - [QEMU](https://www.qemu.org/)
 - [EDK2](https://github.com/tianocore/edk2)
-- Compilator C
-- Compilator NASM
+- C complier
+   NASM complier
 ```
 sudo apt-get install build-essential qemu nasm ovmf
 ```
-Pentru a se pregati mediul de dezvoltare EDK2, se vor urma instructiunile de pe site-ul lor.<br>
-Recomand urmatoarea [metoda / tutorial](https://wiki.ubuntu.com/UEFI/EDK2).
+To prepare the EDK2 development environment, the instructions on their website will be followed.<br>
+I recommend the following [method / tutorial](https://wiki.ubuntu.com/UEFI/EDK2).
 
-### Compilare
-Initial se cloneaza proiectul.
+### Compilation
+Clone the project, and proceed with the following commands:
 
 ```
 cd KetchupMaze
 make
 ```
 
-Pentru a sterge sursele generate:
+To delete the generated sources:
 ```
 make clean
 ```
 
-### Testare
-Pentru a rula proiectul in QEMU, am pus la dispozitie un script de testare:
+### Testing
+Running the project in QEMU is facilitated by the _build_and_test.sh_ script.
 ```
 cd bin
 ./build_and_test.sh
 ```
 
-Din QEMU, se va apasa ESC, iar apoi:
+Press _ESC_ in QEMU, and then load and boot the corresponding filesystem using those commands:
 ```
 > fs0:
 > bootx64
 ```
 
-Bootloader-ul se va lansa. Extensia proiectului initial se poate observa prin optiunea G (Game).
+The extension of the initial project can be seen through the G (Game) option.
 
 
-## Proiecte similare (standalone)
+## Similar (standalone) projects
 - [The UEFI Maze Game](https://uefi.blogspot.com/2016/11/the-uefi-maze-game-part-1.html)
 - [Firmware Maze](https://github.com/liute62/Firmware-UEFI-Maze-Game)
 
-### Element de inovatie
-Proiectul curent aduce, in plus, partea de integrare intr-un bootloader sursa, capabil sa incarce un SO. <br>
-Astfel, se poate utiliza in viitor chiar si in afara unei masini virtuale (ex.: QEMU), ca bootloader principal al unui sistem de calcul.
+### Innovative element
+The project binds together the UEFI game concept with a functional bootloader. <br>
+Thus, it can be used in the future even outside a virtual machine (e.g. QEMU) as the main bootloader of a computing system.
 
-## Detalii de implementare
+## Implementation details
 
-### Contributii personale
-Urmatoarele fisiere sunt contributia mea personala, integral:
+### Personal contributions
+Intergal personal contribution with the files:
 - src/menus/ChooseLevel.c
 - src/menus/GameUtils.c
 - src/menus/EasyGameMenu.c
@@ -77,35 +81,35 @@ Urmatoarele fisiere sunt contributia mea personala, integral:
 - src/menus/HardGameMenu.c
 - src/util/MemUtils.c
 
-Partial:
+Partially, added code to the following existing files:
 - src/menus/Menus.h
 - src/menus/Menus.c
 - src/menus/MainMenu.c
 
-### Descreire implementare functii
-Initial, am cautat sa inteleg proiectul sursa, pentru a integra cat mai bine jocul in acesta. Necesitatea functiilor a fost dedusa treptat, observand portiunile de cod ce se repeta / sunt foarte complexe in scriere. <br>
-Majoritatea functiilor utilizate se afla in src/menus/GameUtils.c, iar implementarile principale sunt:
+### Description of functions implemented
+Initially, I tried to understand the source project, in order to integrate the game into it as well as possible. The need for the functions was deduced gradually, observing the portions of the code that are repeated / are very complex to write. <br>
+Most of the functions used are in src/menus/GameUtils.c, and the main implementations are:
 
-#### Desenarea labirintului - DrawMaze()
-Urmeaza modelul desnearii logo-ului bootloaderului sursa. <br>
-Astfel, se defineste un array de tip CHAR8 pentru fiecare maze de desenat. Se foloseste CHAR8 deoarece culorile UEFI sunt definite astfel (prin etichete, de ex.: EFI_RED, EFI_GREEN). <br>
-Se definesc dimensiunile array-ului (2 dimensiuni - se va accesa ca o matrice), si coordonatele coltului din stanga sus, de unde se va incepe desenarea. Se foloseste wrapperul proiectului sursa: DrawImage(...), ce foloseste UEFI Graphics Output Protocol.
+#### Labyrinth drawing - DrawMaze()
+The pattern of drawing the source bootloader logo follows. <br>
+Thus, a CHAR8 type array is defined for each maze to be drawn. CHAR8 is used because UEFI colors are defined this way (by tags, eg: EFI_RED, EFI_GREEN). <br>
+Next are defined the dimensions of the array (2 dimensions - it will be accessed as a matrix), and the coordinates of the top left corner, where the drawing will start. The source project wrapper used: DrawImage(...), which uses the UEFI Graphics Output Protocol.
 
-#### Schimbarea culorii - DrawMazeColor(CHAR8 maze_color)
-Se definesc array-uri de tip CHAR8 diferite pentru fiecare culoare + un array pe care se va plimba caracterul. Nu este o metoda eficienta, insa este singura gasita momentan, datorita macro-urilor necesare (#define). Functia primeste culoarea dorita si deseneaza pe ecran maze-ul dorit ca si culoare, copiind de fiecare data maze-ul in care se va deplasa caracterul.
+#### Color change - DrawMazeColor(CHAR8 maze_color)
+Different CHAR8 type arrays are defined for each color + an array on which the character will move. It is not an efficient method, but it is the only one found at the moment, thanks to the necessary macros (#define). The function receives the desired color and draws the desired maze on the screen as a color, copying each time the maze in which the character will move.
 
-#### Deplasarea caracterului - int moveInMaze(int pos, int height, int moves[4])
-Functia foloseste UEFI Standard Input Text Protocol, si defineste mutarile posibile intr-o anumita pozitie, facand legatura cu desenarea in maze a acestora.<br>
-Functia primeste pozitia pentru care se definesc mutarile (pos), inaltimea maze-ului (height), si un array in care se specifica pozitiile (moves[4]). Ordinea tastelor este W, A, S, D (sus, stanga, jos, dreapta), iar pozitiile posibile sunt marcate cu 1, cele imposibile cu 0. Un exemplu de array: [1, 0, 0, 0], inseamna ca singura mutare valida este in sus (tasta W).
+#### Character movement - int moveInMaze(int pos, int height, int moves[4])
+The function uses the UEFI Standard Input Text Protocol, and defines the possible moves in a certain position, making the connection with their drawing in the maze.<br>
+The function receives the position for which the moves are defined (pos), the height of the maze (height), and an array in which the positions are specified (moves[4]). The order of the keys is W, A, S, D (up, left, down, right), and the possible positions are marked with 1, the impossible ones with 0. An example of an array: [1, 0, 0, 0], means that the only valid move is up (W key).
 
-### Probleme intampinate
+### Encountered problems
 
-#### Performantele video
-Jocul efectueaza o multime de operatii cu Graphics Output Protocol, solictiand memoria video. La fiecare mutare valida in maze, imaginea acestuia se va reincarca, la fel si in cazul schimbarii culorii, de exemplu. <br>
-Incercarea de a implementa labirinturi mai complexe va solicita memoria video, suficient incat sa produca un deranj vizual: timpul de incarcare a liniilor va creste iar "refresh-ul" labirintului se face foarte lent.<br><br>
-Rezolvarea problemei ar implica regandirea intregii implementari a mutarilor in maze, insa este luata in considerare pe viitor pentru progresul proiectului. 
+#### Video performance
+The game performs a lot of operations with the Graphics Output Protocol, crowding the video memory. With each valid move in the maze, its image will be reloaded, as well as in the case of color change, for example. <br>
+The attempt to implement more complex mazes will crowd the video memory, enough to produce a visual disturbance: the loading time of the lines will increase and the "refresh" of the maze is very slow.<br><br>
+Solving the problem would involve rethinking the entire implementation of the moves in the mazes, but it is taken into account in the future for the progress of the project.
 
-#### Warning-uri inutile
-La compilare, apar warning-uri de tipul -W-unused-function, deoarece functiile utile nu sunt utilizate in acelasi fisier, ci in alte fisiere.<br><br>
-Pentru o compilare "curata", s-au adaugat pragma-uri in aceste cazuri.
+#### -W-unused-function warnings
+When compiling, warnings of the type -W-unused-function appear, because the useful functions are not used in the same file, but in other files.<br><br>
+For a "clean" compilation, pragmas were added in these cases.
 
